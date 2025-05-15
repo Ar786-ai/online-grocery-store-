@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100 text-gray-800 transition duration-300">
+<head>
+    <meta charset="UTF-8">
+    <title>Zesto - Grocery Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .cart-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .dark-mode-toggle {
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        .main-content {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            document.documentElement.classList.toggle('bg-gray-900');
+            document.documentElement.classList.toggle('text-white');
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav class="bg-white shadow-lg p-4 flex justify-between items-center dark:bg-gray-800 sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-2">
+                <img src="{{ url_for('static', filename='images/zesto-logo.png') }}" alt="Zesto Logo" class="h-10 w-10">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Zesto</h1>
+            </a>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <a href="{{ url_for('index') }}" class="nav-link text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400">Home</a>
+            <a href="{{ url_for('cart') }}" class="nav-link relative inline-block text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400">
+                Cart 🛒
+                {% if cart_count > 0 %}
+                <span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">{{ cart_count }}</span>
+                {% endif %}
+            </a>
+            {% if current_user.is_authenticated %}
+                <div class="relative group">
+                    <button class="flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400">
+                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span>{{ current_user.username }}</span>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 hidden group-hover:block">
+                        <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                        <a href="{{ url_for('orders') }}" class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Orders</a>
+                        <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-link px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300">Create Account</a>
+            {% endif %}
+            <button onclick="toggleDarkMode()" class="dark-mode-toggle text-sm px-3 py-2 bg-gray-200 rounded-full hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300">🌓</button>
+        </div>
+    </nav>
+    <main class="flex-grow container mx-auto px-4 py-8 main-content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
